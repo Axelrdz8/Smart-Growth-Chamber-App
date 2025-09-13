@@ -50,8 +50,8 @@ st.markdown("""
 
 /* ---- Título Dashboard ---- */
 .dashboard-title {
-    margin-top: 0.8rem !important;     /* compacta en móvil */
-    margin-bottom: 0.8rem !important;
+    margin-top: 0.9rem !important;     /* compacta en móvil */
+    margin-bottom: 0.3rem !important;
 }
 
 /* ---- Compactar el padding del contenedor en móvil ---- */
