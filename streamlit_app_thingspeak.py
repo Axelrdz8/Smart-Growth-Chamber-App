@@ -14,10 +14,10 @@ MAX_POINTS = 8000
 
 # ---- UMBRALES para las 4 tarjetas del resumen ----
 LIMITS_MAIN = {
-    "soil_moist": (25, 60),   # %
-    "air_temp":   (20, 40),   # °C
-    "air_hum":    (40, 70),   # %
-    "soil_ph":    (6.5, 7.8)  # pH
+    "soil_moist": (25, 50),   # %
+    "air_temp":   (20, 30),   # °C
+    "air_hum":    (40, 60),   # %
+    "soil_ph":    (5.5, 6.8)  # pH
 }
 
 def _in_range(val, lo_hi):
@@ -32,7 +32,7 @@ def _bg_for_main(metric_key, value):
         return "#3F4F61"                    # sin dato -> gris
     return "red" if not _in_range(value, LIMITS_MAIN[metric_key]) else "#3F4F61"
 
-# -------------------- estilos CSS --------------------
+# -------------------- estilos CSS tarjetas --------------------
 st.markdown("""
 <style>
 .kpi-card {
@@ -54,6 +54,23 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
+# -------------------- estilos CSS titulo --------------------
+st.markdown("""
+<style>
+.dashboard-title {
+    margin-top: 0.2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Para pantallas grandes (ej. PC > 768px) */
+@media (min-width: 768px) {
+    .dashboard-title {
+        margin-top: 0.8rem;
+        margin-bottom: 1.2rem;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
 
 st.set_page_config(page_title="Smart Growth Chamber", page_icon="🌱", layout="wide")
 
@@ -62,7 +79,7 @@ def _clean(s: str) -> str:
         return ""
     return re.sub(r'\s+', ' ', s).strip()
 
-@st.cache_data(ttl=120)
+@st.cache_data(ttl=300)
 def fetch_thingspeak(channel_id: int, timezone: str, use_range: bool,
                      start_date: date, end_date: date, max_points: int,
                      read_key: str | None):
@@ -179,12 +196,12 @@ meta_env,  df_env  = fetch_thingspeak(CHANNEL_ENV,  tz, use_range, start_date, e
 labels_soil = label_map_from_meta(meta_soil or {})
 labels_env  = label_map_from_meta(meta_env  or {})
 
-st.markdown("## Dashboard")
+# Título
+st.markdown('<h2 class="dashboard-title">Dashboard</h2>', unsafe_allow_html=True)
 
-def plot_metric(df, field, title, y_label, unit="", icon="", metric_key=None):
+def plot_metric(df, field, title, y_label, unit="", icon=""):
     val, ts = latest_value(df, field)
-    bg = _bg_for_main(metric_key, val) if metric_key else "#3F4F61"
-    kpi_card_full(title, val, unit=unit, icon=icon, ts=ts, bg_color=bg)
+    kpi_card_full(title, val, unit=unit, icon=icon, ts=ts)
     if not field or df.empty or field not in df.columns:
         st.warning("Campo no disponible.")
         return
@@ -197,9 +214,9 @@ def plot_metric(df, field, title, y_label, unit="", icon="", metric_key=None):
     st.plotly_chart(fig, use_container_width=True)
 
 if page == "Soil Temperature":
-    plot_metric(df_soil, "field1", "Soil Temperature", "°C", unit="°C", icon="🌡️", metric_key="soil_temp")
+    plot_metric(df_soil, "field1", "Soil Temperature", "°C", unit="°C", icon="🌡️")
 elif page == "Soil Moisture":
-    plot_metric(df_soil, "field2", "Soil Moisture", "%", unit="%", icon="💧", metric_key="soil_moist")
+    plot_metric(df_soil, "field2", "Soil Moisture", "%", unit="%", icon="💧")
 elif page == "Soil Conductivity":
     plot_metric(df_soil, "field3", "Soil Conductivity", "µS/cm", unit="µS/cm", icon="🧲")
 elif page == "Soil pH":
@@ -211,9 +228,9 @@ elif page == "Soil P concentration":
 elif page == "Soil K concentration":
     plot_metric(df_soil, "field7", "Soil K concentration", "mg/kg", unit="mg/kg", icon="🧬")
 elif page == "Air Temperature":
-    plot_metric(df_env, "field1", "Air Temperature", "°C", unit="°C", icon="🌡️", metric_key="air_temp")
+    plot_metric(df_env, "field1", "Air Temperature", "°C", unit="°C", icon="🌡️")
 elif page == "Air Humidity":
-    plot_metric(df_env, "field2", "Air Humidity", "%", unit="%", icon="💦", metric_key="air_hum")
+    plot_metric(df_env, "field2", "Air Humidity", "%", unit="%", icon="💦")
 elif page == "Luminosity":
     plot_metric(df_env, "field3", "Luminosity", "lux", unit="lux", icon="💡")
 elif page == "CO2 concentration":
