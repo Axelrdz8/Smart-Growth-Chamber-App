@@ -1,6 +1,3 @@
-# streamlit_agri_dual_thingspeak.py
-# (content identical to last version above)
-# -----------------------------------------------------------
 import os
 import re
 import requests
@@ -17,10 +14,10 @@ MAX_POINTS = 8000
 
 # ---- UMBRALES para las 4 tarjetas del resumen ----
 LIMITS_MAIN = {
-    "soil_moist": (25, 40),   # %
-    "air_temp":   (20, 25),   # °C
-    "air_hum":    (40, 50),   # %
-    "soil_ph":    (5.5, 6.5)  # pH
+    "soil_moist": (25, 50),   # %
+    "air_temp":   (20, 30),   # °C
+    "air_hum":    (40, 60),   # %
+    "soil_ph":    (5.5, 6.8)  # pH
 }
 
 def _in_range(val, lo_hi):
@@ -183,7 +180,6 @@ labels_soil = label_map_from_meta(meta_soil or {})
 labels_env  = label_map_from_meta(meta_env  or {})
 
 st.markdown("## Dashboard")
-col1, col2, col3, col4 = st.columns(4)
 
 def plot_metric(df, field, title, y_label, unit="", icon=""):
     val, ts = latest_value(df, field)
@@ -222,13 +218,23 @@ elif page == "Luminosity":
 elif page == "CO2 concentration":
     plot_metric(df_env, "field4", "CO2 concentration", "ppm", unit="ppm", icon="🟢")
 elif page == "Resumen":
-    val_sm, _ = latest_value(df_soil, "field2")
-    val_ta, _ = latest_value(df_env,  "field1")
-    val_rh, _ = latest_value(df_env,  "field2")
-    val_ph, _ = latest_value(df_soil, "field4")
-    kpi_card(col1, "Soil Moisture", val_sm, unit="%", icon="💧")
-    kpi_card(col2, "Air Temp", val_ta, unit="°C", icon="🌡️")
-    kpi_card(col3, "Air Humidity", val_rh, unit="%", icon="💦")
-    kpi_card(col4, "Soil pH", val_ph, unit="pH", icon="🧪")
+    col1, col2, col3, col4 = st.columns(4)
+    # Últimos valores
+    val_sm, _ = latest_value(df_soil, "field2")   # Soil Moisture
+    val_ta, _ = latest_value(df_env,  "field1")   # Air Temp
+    val_rh, _ = latest_value(df_env,  "field2")   # Air Humidity
+    val_ph, _ = latest_value(df_soil, "field4")   # Soil pH
+
+    # Fondos dinámicos (rojo si fuera de rango)
+    bg_sm = _bg_for_main("soil_moist", val_sm)
+    bg_ta = _bg_for_main("air_temp",   val_ta)
+    bg_rh = _bg_for_main("air_hum",    val_rh)
+    bg_ph = _bg_for_main("soil_ph",    val_ph)
+
+    col1, col2, col3, col4 = st.columns(4)
+    kpi_card(col1, "Soil Moisture", val_sm, unit="%", icon="💧", bg_color=bg_sm)
+    kpi_card(col2, "Air Temp",      val_ta, unit="°C", icon="🌡️", bg_color=bg_ta)
+    kpi_card(col3, "Air Humidity",  val_rh, unit="%", icon="💦", bg_color=bg_rh)
+    kpi_card(col4, "Soil pH",       val_ph, unit="pH", icon="🧪", bg_color=bg_ph)
 else:
     st.write("Selecciona una métrica del menú lateral.")
