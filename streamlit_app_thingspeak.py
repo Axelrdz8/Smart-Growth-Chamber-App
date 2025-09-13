@@ -181,9 +181,10 @@ labels_env  = label_map_from_meta(meta_env  or {})
 
 st.markdown("## Dashboard")
 
-def plot_metric(df, field, title, y_label, unit="", icon=""):
+def plot_metric(df, field, title, y_label, unit="", icon="", metric_key=None):
     val, ts = latest_value(df, field)
-    kpi_card_full(title, val, unit=unit, icon=icon, ts=ts)
+    bg = _bg_for_main(metric_key, val) if metric_key else "#3F4F61"
+    kpi_card_full(title, val, unit=unit, icon=icon, ts=ts, bg_color=bg)
     if not field or df.empty or field not in df.columns:
         st.warning("Campo no disponible.")
         return
@@ -196,9 +197,9 @@ def plot_metric(df, field, title, y_label, unit="", icon=""):
     st.plotly_chart(fig, use_container_width=True)
 
 if page == "Soil Temperature":
-    plot_metric(df_soil, "field1", "Soil Temperature", "°C", unit="°C", icon="🌡️")
+    plot_metric(df_soil, "field1", "Soil Temperature", "°C", unit="°C", icon="🌡️", metric_key="soil_temp")
 elif page == "Soil Moisture":
-    plot_metric(df_soil, "field2", "Soil Moisture", "%", unit="%", icon="💧")
+    plot_metric(df_soil, "field2", "Soil Moisture", "%", unit="%", icon="💧", metric_key="soil_moist")
 elif page == "Soil Conductivity":
     plot_metric(df_soil, "field3", "Soil Conductivity", "µS/cm", unit="µS/cm", icon="🧲")
 elif page == "Soil pH":
@@ -210,9 +211,9 @@ elif page == "Soil P concentration":
 elif page == "Soil K concentration":
     plot_metric(df_soil, "field7", "Soil K concentration", "mg/kg", unit="mg/kg", icon="🧬")
 elif page == "Air Temperature":
-    plot_metric(df_env, "field1", "Air Temperature", "°C", unit="°C", icon="🌡️")
+    plot_metric(df_env, "field1", "Air Temperature", "°C", unit="°C", icon="🌡️", metric_key="air_temp")
 elif page == "Air Humidity":
-    plot_metric(df_env, "field2", "Air Humidity", "%", unit="%", icon="💦")
+    plot_metric(df_env, "field2", "Air Humidity", "%", unit="%", icon="💦", metric_key="air_hum")
 elif page == "Luminosity":
     plot_metric(df_env, "field3", "Luminosity", "lux", unit="lux", icon="💡")
 elif page == "CO2 concentration":
