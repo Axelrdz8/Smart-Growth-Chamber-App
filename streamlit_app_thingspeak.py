@@ -84,7 +84,7 @@ st.markdown("""
 @media (min-width: 768px) {
     .sidebar-title {
         margin-top: 0.1rem !important;
-        margin-bottom: 1rem !important;
+        margin-bottom: 0.5rem !important;
     }
 }
 </style>
