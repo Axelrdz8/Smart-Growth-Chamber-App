@@ -59,7 +59,7 @@ st.markdown("""
 <style>
 .dashboard-title {
     margin-top: 0.2rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem;
 }
 
 /* Para pantallas grandes (ej. PC > 768px) */
