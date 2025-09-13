@@ -65,7 +65,7 @@ st.markdown("""
 /* Para pantallas grandes (ej. PC > 768px) */
 @media (min-width: 768px) {
     .dashboard-title {
-        margin-top: 0.8rem;
+        margin-top: 1.2rem;
         margin-bottom: 1.2rem;
     }
 }
