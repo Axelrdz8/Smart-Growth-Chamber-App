@@ -57,7 +57,7 @@ st.markdown("""
 /* ---- Compactar el padding del contenedor en móvil ---- */
 @media (max-width: 767px) {
     .block-container {
-        padding-top: 0.5rem !important;
+        padding-top: 0.3rem !important;
         padding-bottom: 0.2rem !important;
     }
 }
