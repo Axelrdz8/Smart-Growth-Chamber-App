@@ -14,10 +14,10 @@ MAX_POINTS = 8000
 
 # ---- UMBRALES para las 4 tarjetas del resumen ----
 LIMITS_MAIN = {
-    "soil_moist": (25, 50),   # %
-    "air_temp":   (20, 30),   # °C
-    "air_hum":    (40, 60),   # %
-    "soil_ph":    (5.5, 6.8)  # pH
+    "soil_moist": (25, 60),   # %
+    "air_temp":   (20, 40),   # °C
+    "air_hum":    (40, 70),   # %
+    "soil_ph":    (6.5, 7.8)  # pH
 }
 
 def _in_range(val, lo_hi):
