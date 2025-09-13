@@ -76,14 +76,14 @@ st.markdown("""
 
 /* Ajuste del título en el sidebar */
 .sidebar-title {
-    margin-top: 0.2rem !important;
+    margin-top: 0.1rem !important;
     margin-bottom: 0.5rem !important;
 }
 
 /* Responsive en el sidebar */
 @media (min-width: 768px) {
     .sidebar-title {
-        margin-top: 0.6rem !important;
+        margin-top: 0.1rem !important;
         margin-bottom: 1rem !important;
     }
 }
