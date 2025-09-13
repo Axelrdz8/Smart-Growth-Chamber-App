@@ -37,55 +37,40 @@ st.set_page_config(page_title="Smart Growth Chamber", page_icon="🌱", layout="
 # -------------------- estilos CSS tarjetas + titulo --------------------
 st.markdown("""
 <style>
-/* ---- Ajuste general de tarjetas ---- */
-.kpi-card {
-    background-color: #3F4F61;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    margin-bottom: 15px;
-}
-.kpi-card h2 { font-size: 2em; margin: 0; color: white; }
-.kpi-card p  { margin: 0; font-size: 1.1em; color: white; }
-
-/* ---- Título Dashboard ---- */
+/* ---- Título del Dashboard (ya lo tienes) ---- */
 .dashboard-title {
-    margin-top: 0.9rem !important;     /* compacta en móvil */
+    margin-top: 0.9rem !important;
     margin-bottom: 0.2rem !important;
 }
 
-/* ---- Compactar el padding del contenedor en móvil ---- */
-@media (max-width: 767px) {
-    .block-container {
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
-    }
-}
-
-/* ---- En escritorio, un poco más de aire ---- */
-@media (min-width: 768px) {
-    .dashboard-title {
-        margin-top: 0.8rem !important;
-        margin-bottom: 1.2rem !important;
-    }
-    .block-container {
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-    }
-}
-
-/* Ajuste del título en el sidebar */
+/* ---- Título del sidebar ---- */
 .sidebar-title {
     margin-top: 0.1rem !important;
     margin-bottom: 0.5rem !important;
 }
 
-/* Responsive en el sidebar */
-@media (min-width: 768px) {
-    .sidebar-title {
-        margin-top: 0.1rem !important;
-        margin-bottom: 0.5rem !important;
-    }
+/* 🔧 QUITAR ESPACIO SUPERIOR DEL SIDEBAR */
+section[data-testid="stSidebar"] {
+    padding-top: 0 !important;     /* quita padding del propio sidebar */
+}
+div[data-testid="stSidebarContent"] {
+    padding-top: 0.25rem !important;  /* muy compacto; ajusta a gusto */
+}
+/* Fallback extra: primer contenedor dentro del sidebar */
+section[data-testid="stSidebar"] > div:first-child {
+    padding-top: 0.25rem !important;
+}
+
+/* Asegurar que el primer heading no agregue margen extra */
+section[data-testid="stSidebar"] h1:first-child,
+section[data-testid="stSidebar"] h2:first-child,
+section[data-testid="stSidebar"] h3:first-child {
+    margin-top: 0.25rem !important;
+}
+
+/* Opcional: compactar también el margen inferior del logo/toolbar móvil si aparece */
+@media (max-width: 767px) {
+  section[data-testid="stSidebar"] { padding-bottom: .5rem !important; }
 }
 </style>
 """, unsafe_allow_html=True)
