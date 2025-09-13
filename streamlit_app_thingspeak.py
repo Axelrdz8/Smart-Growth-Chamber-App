@@ -58,7 +58,7 @@ st.markdown("""
 @media (max-width: 767px) {
     .block-container {
         padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
+        padding-bottom: 0.3rem !important;
     }
 }
 
