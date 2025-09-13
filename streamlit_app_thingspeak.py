@@ -62,7 +62,7 @@ def _clean(s: str) -> str:
         return ""
     return re.sub(r'\s+', ' ', s).strip()
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=120)
 def fetch_thingspeak(channel_id: int, timezone: str, use_range: bool,
                      start_date: date, end_date: date, max_points: int,
                      read_key: str | None):
