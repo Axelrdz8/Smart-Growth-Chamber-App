@@ -32,47 +32,49 @@ def _bg_for_main(metric_key, value):
         return "#3F4F61"                    # sin dato -> gris
     return "red" if not _in_range(value, LIMITS_MAIN[metric_key]) else "#3F4F61"
 
-# -------------------- estilos CSS tarjetas --------------------
+st.set_page_config(page_title="Smart Growth Chamber", page_icon="🌱", layout="wide")
+
+# -------------------- estilos CSS tarjetas + titulo --------------------
 st.markdown("""
 <style>
+/* ---- Ajuste general de tarjetas ---- */
 .kpi-card {
-    background-color: #3F4F61;  /* fondo por defecto (gris) */
+    background-color: #3F4F61;
     padding: 20px;
     border-radius: 12px;
     text-align: center;
     margin-bottom: 15px;
 }
-.kpi-card h2 {
-    font-size: 2em;
-    margin: 0;
-    color: white;    /* texto blanco */
-}
-.kpi-card p {
-    margin: 0;
-    font-size: 1.1em;
-    color: white;    /* texto blanco */
-}
-</style>
-""", unsafe_allow_html=True)
-# -------------------- estilos CSS titulo --------------------
-st.markdown("""
-<style>
+.kpi-card h2 { font-size: 2em; margin: 0; color: white; }
+.kpi-card p  { margin: 0; font-size: 1.1em; color: white; }
+
+/* ---- Título Dashboard ---- */
 .dashboard-title {
-    margin-top: 0.2rem;
-    margin-bottom: 0.2rem;
+    margin-top: 0.2rem !important;     /* compacta en móvil */
+    margin-bottom: 0.5rem !important;
 }
 
-/* Para pantallas grandes (ej. PC > 768px) */
+/* ---- Compactar el padding del contenedor en móvil ---- */
+@media (max-width: 767px) {
+    .block-container {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+}
+
+/* ---- En escritorio, un poco más de aire ---- */
 @media (min-width: 768px) {
     .dashboard-title {
-        margin-top: 1.2rem;
-        margin-bottom: 1.2rem;
+        margin-top: 0.8rem !important;
+        margin-bottom: 1.2rem !important;
+    }
+    .block-container {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
     }
 }
 </style>
 """, unsafe_allow_html=True)
-
-st.set_page_config(page_title="Smart Growth Chamber", page_icon="🌱", layout="wide")
 
 def _clean(s: str) -> str:
     if not s:
