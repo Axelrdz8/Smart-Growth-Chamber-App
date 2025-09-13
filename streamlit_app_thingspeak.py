@@ -74,20 +74,19 @@ st.markdown("""
     }
 }
 
-/* Ajuste del título del sidebar */
-section[data-testid="stSidebar"] .css-1v0mbdj h1, 
-section[data-testid="stSidebar"] .css-1v0mbdj h2, 
-section[data-testid="stSidebar"] .css-1v0mbdj h3 {
-    margin-top: 0.5rem !important;   /* menos espacio arriba */
-    margin-bottom: 0.5rem !important; /* menos espacio abajo */
-    font-size: 1.2rem !important;     /* opcional: reducir tamaño */
+/* Ajuste del título en el sidebar */
+.sidebar-title {
+    margin-top: 0.2rem !important;
+    margin-bottom: 0.5rem !important;
 }
 
-/* compactar padding del sidebar */
-section[data-testid="stSidebar"] {
-    padding-top: 0.5rem !important;
+/* Responsive en el sidebar */
+@media (min-width: 768px) {
+    .sidebar-title {
+        margin-top: 0.6rem !important;
+        margin-bottom: 1rem !important;
+    }
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -189,7 +188,7 @@ def kpi_card(col, title, value, unit="", icon="", bg_color="#3F4F61"):
         )
 
 with st.sidebar:
-    st.title("Smart Growth Chamber 🌱")
+    st.markdown('<h2 class="sidebar-title">Smart Growth Chamber 🌱</h2>', unsafe_allow_html=True)
     tz = st.text_input("Zona horaria", value=DEFAULT_TIMEZONE)
     res_min = st.number_input("Resampleo (min)", value=DEFAULT_RES_MIN, min_value=1, step=1)
     today = date.today()
