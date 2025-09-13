@@ -73,6 +73,21 @@ st.markdown("""
         padding-bottom: 1rem !important;
     }
 }
+
+/* Ajuste del título del sidebar */
+section[data-testid="stSidebar"] .css-1v0mbdj h1, 
+section[data-testid="stSidebar"] .css-1v0mbdj h2, 
+section[data-testid="stSidebar"] .css-1v0mbdj h3 {
+    margin-top: 0.5rem !important;   /* menos espacio arriba */
+    margin-bottom: 0.5rem !important; /* menos espacio abajo */
+    font-size: 1.2rem !important;     /* opcional: reducir tamaño */
+}
+
+/* compactar padding del sidebar */
+section[data-testid="stSidebar"] {
+    padding-top: 0.5rem !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
