@@ -15,11 +15,31 @@ DEFAULT_TIMEZONE = "America/Monterrey"
 DEFAULT_RES_MIN = 10
 MAX_POINTS = 8000
 
+# ---- UMBRALES para las 4 tarjetas del resumen ----
+LIMITS_MAIN = {
+    "soil_moist": (25, 50),   # %
+    "air_temp":   (20, 30),   # °C
+    "air_hum":    (40, 60),   # %
+    "soil_ph":    (5.5, 6.8)  # pH
+}
+
+def _in_range(val, lo_hi):
+    lo, hi = lo_hi
+    return (val is not None) and (lo <= val <= hi)
+
+def _bg_for_main(metric_key, value):
+    """
+    Devuelve color de fondo para la tarjeta (rojo si fuera de rango, gris si OK).
+    """
+    if value is None:
+        return "#3F4F61"                    # sin dato -> gris
+    return "red" if not _in_range(value, LIMITS_MAIN[metric_key]) else "#3F4F61"
+
 # -------------------- estilos CSS --------------------
 st.markdown("""
 <style>
 .kpi-card {
-    background-color: #3F4F61;
+    background-color: #3F4F61;  /* fondo por defecto (gris) */
     padding: 20px;
     border-radius: 12px;
     text-align: center;
@@ -28,12 +48,12 @@ st.markdown("""
 .kpi-card h2 {
     font-size: 2em;
     margin: 0;
-    color: white;      /* <-- texto blanco */
+    color: white;    /* texto blanco */
 }
 .kpi-card p {
     margin: 0;
     font-size: 1.1em;
-    color: white;      /* <-- texto blanco (sin #) */
+    color: white;    /* texto blanco */
 }
 </style>
 """, unsafe_allow_html=True)
@@ -111,12 +131,12 @@ def resample_series(df, field, minutes: int):
         return pd.Series(dtype=float)
     return df[field].resample(f"{int(minutes)}T", label="right").mean()
 
-def kpi_card_full(title, value, unit="", icon="", ts=None):
+def kpi_card_full(title, value, unit="", icon="", ts=None, bg_color="#3F4F61"):
     display_val = "—" if value is None else f"{value:.2f} {unit}".strip()
     ts_txt = "" if ts is None else f"<p><em>{ts}</em></p>"
     st.markdown(
         f"""
-        <div class="kpi-card">
+        <div class="kpi-card" style="background-color:{bg_color};">
             <h2>{icon} {title}: {display_val}</h2>
             {ts_txt}
         </div>
@@ -124,12 +144,12 @@ def kpi_card_full(title, value, unit="", icon="", ts=None):
         unsafe_allow_html=True,
     )
 
-def kpi_card(col, title, value, unit="", icon=""):
+def kpi_card(col, title, value, unit="", icon="", bg_color="#3F4F61"):
     display_val = "—" if value is None else f"{value:.2f} {unit}".strip()
     with col:
         st.markdown(
             f"""
-            <div class="kpi-card">
+            <div class="kpi-card" style="background-color:{bg_color};">
                 <h2>{icon} {title}</h2>
                 <p>{display_val}</p>
             </div>
@@ -164,14 +184,6 @@ labels_env  = label_map_from_meta(meta_env  or {})
 
 st.markdown("## Dashboard")
 col1, col2, col3, col4 = st.columns(4)
-val_sm, _ = latest_value(df_soil, "field2")
-val_ta, _ = latest_value(df_env,  "field1")
-val_rh, _ = latest_value(df_env,  "field2")
-val_ph, _ = latest_value(df_soil, "field4")
-kpi_card(col1, "Soil Moisture", val_sm, unit="%", icon="💧")
-kpi_card(col2, "Air Temp", val_ta, unit="°C", icon="🌡️")
-kpi_card(col3, "Air Humidity", val_rh, unit="%", icon="💦")
-kpi_card(col4, "Soil pH", val_ph, unit="pH", icon="🧪")
 
 def plot_metric(df, field, title, y_label, unit="", icon=""):
     val, ts = latest_value(df, field)
@@ -209,5 +221,14 @@ elif page == "Luminosity":
     plot_metric(df_env, "field3", "Luminosity", "lux", unit="lux", icon="💡")
 elif page == "CO2 concentration":
     plot_metric(df_env, "field4", "CO2 concentration", "ppm", unit="ppm", icon="🟢")
+elif page == "Resumen":
+    val_sm, _ = latest_value(df_soil, "field2")
+    val_ta, _ = latest_value(df_env,  "field1")
+    val_rh, _ = latest_value(df_env,  "field2")
+    val_ph, _ = latest_value(df_soil, "field4")
+    kpi_card(col1, "Soil Moisture", val_sm, unit="%", icon="💧")
+    kpi_card(col2, "Air Temp", val_ta, unit="°C", icon="🌡️")
+    kpi_card(col3, "Air Humidity", val_rh, unit="%", icon="💦")
+    kpi_card(col4, "Soil pH", val_ph, unit="pH", icon="🧪")
 else:
     st.write("Selecciona una métrica del menú lateral.")
