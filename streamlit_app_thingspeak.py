@@ -188,7 +188,7 @@ def kpi_card(col, title, value, unit="", icon="", bg_color="#3F4F61"):
         )
 
 with st.sidebar:
-    st.markdown('<h2 class="sidebar-title">Smart Growth Chamber 🌱🌱🌱📈📊📉🌱🌱🌱</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="sidebar-title">Smart Growth Chamber 🌱📊🌱</h2>', unsafe_allow_html=True)
     tz = st.text_input("Zona horaria", value=DEFAULT_TIMEZONE)
     res_min = st.number_input("Resampleo (min)", value=DEFAULT_RES_MIN, min_value=1, step=1)
     today = date.today()
