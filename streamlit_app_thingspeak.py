@@ -251,7 +251,6 @@ elif page == "Resumen":
     bg_rh = _bg_for_main("air_hum",    val_rh)
     bg_ph = _bg_for_main("soil_ph",    val_ph)
 
-    col1, col2, col3, col4 = st.columns(4)
     kpi_card(col1, "Soil Moisture", val_sm, unit="%", icon="💧", bg_color=bg_sm)
     kpi_card(col2, "Air Temp",      val_ta, unit="°C", icon="🌡️", bg_color=bg_ta)
     kpi_card(col3, "Air Humidity",  val_rh, unit="%", icon="💦", bg_color=bg_rh)
