@@ -50,7 +50,7 @@ st.markdown("""
 
 /* ---- Título Dashboard ---- */
 .dashboard-title {
-    margin-top: 0.3rem !important;     /* compacta en móvil */
+    margin-top: 0.8rem !important;     /* compacta en móvil */
     margin-bottom: 0.8rem !important;
 }
 
