@@ -260,6 +260,17 @@ def plot_air_temp_with_trend(df_env: pd.DataFrame, title: str, y_label: str, uni
 
     # Figura base
     fig = px.line(series, labels={"index": "", "value": y_label})
+    fig = px.line(series, labels={"index": "", "value": y_label})
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=10, b=40),
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.25,
+            xanchor="center",
+            x=0.5
+        )
+    )
     fig.update_layout(margin=dict(l=20, r=20, t=10, b=20))
     fig.update_traces(name="Air Temp", showlegend=True)
     fig.update_xaxes(title=None)
