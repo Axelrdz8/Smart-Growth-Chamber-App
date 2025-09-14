@@ -284,7 +284,7 @@ def plot_air_temp_with_trend(df_env: pd.DataFrame, title: str, y_label: str, uni
         idx = series.index[-n:]
 
         # ---- Generar valores de x para futuro ----
-        steps_future = 10  # <--- número de pasos de predicción (ej. 10 minutos más si tu resampleo es 1 min)
+        steps_future = 100  # <--- número de pasos de predicción (ej. 10 minutos más si tu resampleo es 1 min)
         x = list(range(n + steps_future))  # 0..n-1 datos reales + futuro
         yhat = [m * xi + b for xi in x]
 
