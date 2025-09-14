@@ -301,6 +301,18 @@ def plot_air_temp_with_trend(df_env: pd.DataFrame, title: str, y_label: str, uni
             line=dict(color="red", dash="dash")
         )
 
+        # ---- Agregar r como "traza fantasma" para que aparezca en la leyenda ----
+        if "field7" in df_env.columns:
+            r_series = df_env["field7"].dropna()
+            if not r_series.empty:
+                r_val = float(r_series.iloc[-1])
+                fig.add_scatter(
+                    x=[series.index[-1]],  # un solo punto
+                    y=[series.iloc[-1]],   # valor cualquiera, no importa
+                    mode="lines",
+                    name=f"r = {r_val:.3f}",
+                    line=dict(color="rgba(0,0,0,0)")  # transparente
+                )
     st.plotly_chart(fig, use_container_width=True)
 
 
