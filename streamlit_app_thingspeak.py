@@ -279,27 +279,27 @@ def plot_air_temp_with_trend(df_env: pd.DataFrame, title: str, y_label: str, uni
     # Últimos parámetros del modelo
     m, b = latest_lin_params(df_env)
 
-    # Dibuja la recta sobre las últimas N muestras (N<=30) si hay modelo
     if m is not None and b is not None and not series.empty:
-        n = min(30, len(series))  # ventana de 30 puntos (5 h) o lo que haya
+        n = min(30, len(series))  # ventana de 30 puntos (o lo que haya)
         idx = series.index[-n:]
-        x = list(range(n))        # x = 0..n-1 (mismo convenio del Arduino)
+
+        # ---- Generar valores de x para futuro ----
+        steps_future = 10  # <--- número de pasos de predicción (ej. 10 minutos más si tu resampleo es 1 min)
+        x = list(range(n + steps_future))  # 0..n-1 datos reales + futuro
         yhat = [m * xi + b for xi in x]
 
-        # Agregar traza de tendencia
+        # Extender el eje de tiempo con la misma frecuencia
+        freq = (idx[1] - idx[0]) if len(idx) > 1 else pd.Timedelta(minutes=res_min)
+        idx_ext = pd.date_range(start=idx[0], periods=len(x), freq=freq)
+
+        # ---- Agregar traza de tendencia proyectada ----
         fig.add_scatter(
-            x=idx,
+            x=idx_ext,
             y=yhat,
             mode="lines",
-            name="Trend (last 30)",
-            line=dict(dash="dash")  # punteada para distinguir
+            name="Trend (last 30 + proj)",
+            line=dict(color="red", dash="dash")
         )
-
-        # (Opcional) muestra r (field7) como anotación
-        if "field7" in df_env.columns:
-            rlast = df_env["field7"].dropna().iloc[-1] if not df_env["field7"].dropna().empty else None
-            if rlast is not None:
-                fig.add_annotation(text=f"r = {float(rlast):.3f}", xref="paper", x=0.01, yref="paper", y=0.95, showarrow=False)
 
     st.plotly_chart(fig, use_container_width=True)
 
