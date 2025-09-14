@@ -206,17 +206,17 @@ def latest_lin_params(df_env: pd.DataFrame):
 
 with st.sidebar:
     st.markdown('<h2 class="sidebar-title">Smart Growth Chamber 🌱📊🌱</h2>', unsafe_allow_html=True)
-    tz = st.text_input("Zona horaria", value=DEFAULT_TIMEZONE)
-    res_min = st.number_input("Resampleo (min)", value=DEFAULT_RES_MIN, min_value=1, step=1)
+    tz = st.text_input("Time Zone", value=DEFAULT_TIMEZONE)
+    res_min = st.number_input("Resampling (min)", value=DEFAULT_RES_MIN, min_value=1, step=1)
     today = date.today()
-    use_range = st.checkbox("Usar rango de fechas", value=False)
-    start_date = st.date_input("Inicio", value=today - timedelta(days=1))
-    end_date = st.date_input("Fin", value=today)
+    use_range = st.checkbox("Use Date Range", value=False)
+    start_date = st.date_input("Start Date", value=today - timedelta(days=1))
+    end_date = st.date_input("End Date", value=today)
     page = st.radio("Ver", [
         "Resumen", "Soil Temperature", "Soil Moisture", "Soil Conductivity", 
         "Soil pH", "Soil N concentration", "Soil P concentration", "Soil K concentration", 
         "Air Temperature", "Air Humidity", "Luminosity", "CO2 concentration"])
-    if st.button("🔄 Actualizar ahora"):
+    if st.button("🔄 Update Data"):
         st.cache_data.clear()   # limpia cache
         st.rerun()              # vuelve a ejecutar y refetch (Streamlit 1.27+)
 
