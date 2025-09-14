@@ -361,6 +361,6 @@ elif page == "Resumen":
     st.markdown("### Sistema general")
     # Opción A: imagen local en tu repo (p.ej. assets/diagrama_sgc.jpg)
     img_path = "assets/diagrama_sgc.jpg"   # pon el archivo ahí en tu proyecto
-    st.image(img_path, use_column_width=True)
+    st.image(img_path, use_container_width=True)
 else:
     st.write("Selecciona una métrica del menú lateral.")
