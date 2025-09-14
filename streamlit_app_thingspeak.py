@@ -187,6 +187,23 @@ def kpi_card(col, title, value, unit="", icon="", bg_color="#3F4F61"):
             unsafe_allow_html=True,
         )
 
+# --- obtener el último modelo (m, b) desde df_env (fields 5 y 6) ---
+def latest_lin_params(df_env: pd.DataFrame):
+    m = None
+    b = None
+    if not df_env.empty:
+        if "field5" in df_env.columns:
+            s = df_env["field5"].dropna()
+            if not s.empty:
+                m = float(s.iloc[-1])
+        if "field6" in df_env.columns:
+            s = df_env["field6"].dropna()
+            if not s.empty:
+                b = float(s.iloc[-1])
+    if m is None or b is None:
+        return None, None
+    return m, b
+
 with st.sidebar:
     st.markdown('<h2 class="sidebar-title">Smart Growth Chamber 🌱📊🌱</h2>', unsafe_allow_html=True)
     tz = st.text_input("Zona horaria", value=DEFAULT_TIMEZONE)
@@ -229,6 +246,53 @@ def plot_metric(df, field, title, y_label, unit="", icon=""):
     fig.update_yaxes(title=y_label)
     st.plotly_chart(fig, use_container_width=True)
 
+def plot_air_temp_with_trend(df_env: pd.DataFrame, title: str, y_label: str, unit: str = "", icon: str = "🌡️"):
+    # KPI arriba como en las otras páginas
+    val, ts = latest_value(df_env, "field1")
+    kpi_card_full(title, val, unit=unit, icon=icon, ts=ts)
+
+    if df_env.empty or "field1" not in df_env.columns:
+        st.warning("Campo no disponible.")
+        return
+
+    # Serie de temperatura (resampleada)
+    series = resample_series(df_env, "field1", res_min).dropna()
+
+    # Figura base
+    fig = px.line(series, labels={"index": "", "value": y_label})
+    fig.update_layout(margin=dict(l=20, r=20, t=10, b=20))
+    fig.update_traces(name="Air Temp", showlegend=True)
+    fig.update_xaxes(title=None)
+    fig.update_yaxes(title=y_label)
+
+    # Últimos parámetros del modelo
+    m, b = latest_lin_params(df_env)
+
+    # Dibuja la recta sobre las últimas N muestras (N<=30) si hay modelo
+    if m is not None and b is not None and not series.empty:
+        n = min(30, len(series))  # ventana de 30 puntos (5 h) o lo que haya
+        idx = series.index[-n:]
+        x = list(range(n))        # x = 0..n-1 (mismo convenio del Arduino)
+        yhat = [m * xi + b for xi in x]
+
+        # Agregar traza de tendencia
+        fig.add_scatter(
+            x=idx,
+            y=yhat,
+            mode="lines",
+            name="Trend (last 30)",
+            line=dict(dash="dash")  # punteada para distinguir
+        )
+
+        # (Opcional) muestra r (field7) como anotación
+        if "field7" in df_env.columns:
+            rlast = df_env["field7"].dropna().iloc[-1] if not df_env["field7"].dropna().empty else None
+            if rlast is not None:
+                fig.add_annotation(text=f"r = {float(rlast):.3f}", xref="paper", x=0.01, yref="paper", y=0.95, showarrow=False)
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
 if page == "Soil Temperature":
     plot_metric(df_soil, "field1", "Soil Temperature", "°C", unit="°C", icon="🌡️")
 elif page == "Soil Moisture":
@@ -244,7 +308,7 @@ elif page == "Soil P concentration":
 elif page == "Soil K concentration":
     plot_metric(df_soil, "field7", "Soil K concentration", "mg/kg", unit="mg/kg", icon="🧬")
 elif page == "Air Temperature":
-    plot_metric(df_env, "field1", "Air Temperature", "°C", unit="°C", icon="🌡️")
+    plot_air_temp_with_trend(df_env, "Air Temperature", "°C", unit="°C", icon="🌡️")
 elif page == "Air Humidity":
     plot_metric(df_env, "field2", "Air Humidity", "%", unit="%", icon="💦")
 elif page == "Luminosity":
