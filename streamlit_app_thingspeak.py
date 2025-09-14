@@ -356,5 +356,11 @@ elif page == "Resumen":
     kpi_card(col2, "Air Temp",      val_ta, unit="°C", icon="🌡️", bg_color=bg_ta)
     kpi_card(col3, "Air Humidity",  val_rh, unit="%", icon="💦", bg_color=bg_rh)
     kpi_card(col4, "Soil pH",       val_ph, unit="pH", icon="🧪", bg_color=bg_ph)
+
+     # --- Imagen de diagrama, ancho completo ---
+    st.markdown("### Sistema general")
+    # Opción A: imagen local en tu repo (p.ej. assets/diagrama_sgc.jpg)
+    img_path = "assets/diagrama_sgc.jpg"   # pon el archivo ahí en tu proyecto
+    st.image(img_path, use_column_width=True)
 else:
     st.write("Selecciona una métrica del menú lateral.")
