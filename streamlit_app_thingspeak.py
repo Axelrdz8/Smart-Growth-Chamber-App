@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 from datetime import datetime, date, timedelta
 import streamlit as st
-import plotly.express as px # type: ignore
+import plotly.express as px  # type: ignore
 
 CHANNEL_SOIL = 2869579
 CHANNEL_ENV  = 2913085
@@ -32,7 +32,7 @@ def _bg_for_main(metric_key, value):
         return "#3F4F61"                    # sin dato -> gris
     return "red" if not _in_range(value, LIMITS_MAIN[metric_key]) else "#3F4F61"
 
-st.set_page_config(page_title="Smart Growth Chamber", page_icon="🌱", layout="wide")
+st.set_page_config(page_title="Cámara de Crecimiento Inteligente", page_icon="🌱", layout="wide")
 
 # -------------------- estilos CSS tarjetas + titulo --------------------
 st.markdown("""
@@ -205,21 +205,30 @@ def latest_lin_params(df_env: pd.DataFrame):
     return m, b
 
 with st.sidebar:
-    st.markdown('<h2 class="sidebar-title">Smart Growth Chamber 🌱📊🌱</h2>', unsafe_allow_html=True)
-    tz = st.text_input("Time Zone", value=DEFAULT_TIMEZONE)
-    res_min = st.number_input("Resampling (min)", value=DEFAULT_RES_MIN, min_value=1, step=1)
+    st.markdown('<h2 class="sidebar-title">Cámara de Crecimiento Inteligente 🌱📊🌱</h2>', unsafe_allow_html=True)
+    tz = st.text_input("Zona horaria", value=DEFAULT_TIMEZONE)
+    res_min = st.number_input("Re-muestreo (min)", value=DEFAULT_RES_MIN, min_value=1, step=1)
     today = date.today()
-    use_range = st.checkbox("Use Date Range", value=False)
-    start_date = st.date_input("Start Date", value=today - timedelta(days=1))
-    end_date = st.date_input("End Date", value=today)
-    page = st.radio("Ver", [
-        "Resumen", "Soil Temperature", "Soil Moisture", "Soil Conductivity", 
-        "Soil pH", "Soil N concentration", "Soil P concentration", "Soil K concentration", 
-        "Air Temperature", "Air Humidity", "Luminosity", "CO2 concentration"])
-    if st.button("🔄 Update Data"):
+    use_range = st.checkbox("Usar rango de fechas", value=False)
+    start_date = st.date_input("Fecha de inicio", value=today - timedelta(days=1))
+    end_date = st.date_input("Fecha de fin", value=today)
+    page = st.radio("Vista", [
+        "Resumen",
+        "Temperatura del suelo",
+        "Humedad del suelo",
+        "Conductividad del suelo",
+        "pH del suelo",
+        "Concentración de N en suelo",
+        "Concentración de P en suelo",
+        "Concentración de K en suelo",
+        "Temperatura del aire",
+        "Humedad del aire",
+        "Luminosidad",
+        "Concentración de CO₂"
+    ])
+    if st.button("🔄 Actualizar datos"):
         st.cache_data.clear()   # limpia cache
         st.rerun()              # vuelve a ejecutar y refetch (Streamlit 1.27+)
-
 
 READ_KEY = os.getenv("TS_READ")
 
@@ -230,7 +239,7 @@ labels_soil = label_map_from_meta(meta_soil or {})
 labels_env  = label_map_from_meta(meta_env  or {})
 
 # Título
-st.markdown('<h2 class="dashboard-title">Dashboard</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class="dashboard-title">Panel de control</h2>', unsafe_allow_html=True)
 
 def plot_metric(df, field, title, y_label, unit="", icon=""):
     val, ts = latest_value(df, field)
@@ -260,7 +269,6 @@ def plot_air_temp_with_trend(df_env: pd.DataFrame, title: str, y_label: str, uni
 
     # Figura base
     fig = px.line(series, labels={"index": "", "value": y_label})
-    fig = px.line(series, labels={"index": "", "value": y_label})
     fig.update_layout(
         margin=dict(l=20, r=20, t=10, b=40),
         legend=dict(
@@ -272,7 +280,7 @@ def plot_air_temp_with_trend(df_env: pd.DataFrame, title: str, y_label: str, uni
         )
     )
     fig.update_layout(margin=dict(l=20, r=20, t=10, b=20))
-    fig.update_traces(name="Air Temp", showlegend=True)
+    fig.update_traces(name="Temp. aire", showlegend=True)
     fig.update_xaxes(title=None)
     fig.update_yaxes(title=y_label)
 
@@ -284,7 +292,7 @@ def plot_air_temp_with_trend(df_env: pd.DataFrame, title: str, y_label: str, uni
         idx = series.index[-n:]
 
         # ---- Generar valores de x para futuro ----
-        steps_future = 100  # <--- número de pasos de predicción (ej. 10 minutos más si tu resampleo es 1 min)
+        steps_future = 100  # número de pasos de predicción
         x = list(range(n + steps_future))  # 0..n-1 datos reales + futuro
         yhat = [m * xi + b for xi in x]
 
@@ -297,7 +305,7 @@ def plot_air_temp_with_trend(df_env: pd.DataFrame, title: str, y_label: str, uni
             x=idx_ext,
             y=yhat,
             mode="lines",
-            name="Trend (last 30 + proj)",
+            name="Tendencia (últimos 30 + proy.)",
             line=dict(color="red", dash="dash")
         )
 
@@ -315,36 +323,36 @@ def plot_air_temp_with_trend(df_env: pd.DataFrame, title: str, y_label: str, uni
                 )
     st.plotly_chart(fig, use_container_width=True)
 
-
-if page == "Soil Temperature":
-    plot_metric(df_soil, "field1", "Soil Temperature", "°C", unit="°C", icon="🌡️")
-elif page == "Soil Moisture":
-    plot_metric(df_soil, "field2", "Soil Moisture", "%", unit="%", icon="💧")
-elif page == "Soil Conductivity":
-    plot_metric(df_soil, "field3", "Soil Conductivity", "µS/cm", unit="µS/cm", icon="🧲")
-elif page == "Soil pH":
-    plot_metric(df_soil, "field4", "Soil pH", "pH", unit="pH", icon="🧪")
-elif page == "Soil N concentration":
-    plot_metric(df_soil, "field5", "Soil N concentration", "mg/kg", unit="mg/kg", icon="🧬")
-elif page == "Soil P concentration":
-    plot_metric(df_soil, "field6", "Soil P concentration", "mg/kg", unit="mg/kg", icon="🧬")
-elif page == "Soil K concentration":
-    plot_metric(df_soil, "field7", "Soil K concentration", "mg/kg", unit="mg/kg", icon="🧬")
-elif page == "Air Temperature":
-    plot_air_temp_with_trend(df_env, "Air Temperature", "°C", unit="°C", icon="🌡️")
-elif page == "Air Humidity":
-    plot_metric(df_env, "field2", "Air Humidity", "%", unit="%", icon="💦")
-elif page == "Luminosity":
-    plot_metric(df_env, "field3", "Luminosity", "lux", unit="lux", icon="💡")
-elif page == "CO2 concentration":
-    plot_metric(df_env, "field4", "CO2 concentration", "ppm", unit="ppm", icon="🟢")
+# --- Ruteo de páginas (todas en español) ---
+if page == "Temperatura del suelo":
+    plot_metric(df_soil, "field1", "Temperatura del suelo", "°C", unit="°C", icon="🌡️")
+elif page == "Humedad del suelo":
+    plot_metric(df_soil, "field2", "Humedad del suelo", "%", unit="%", icon="💧")
+elif page == "Conductividad del suelo":
+    plot_metric(df_soil, "field3", "Conductividad del suelo", "µS/cm", unit="µS/cm", icon="🧲")
+elif page == "pH del suelo":
+    plot_metric(df_soil, "field4", "pH del suelo", "pH", unit="pH", icon="🧪")
+elif page == "Concentración de N en suelo":
+    plot_metric(df_soil, "field5", "Concentración de N en suelo", "mg/kg", unit="mg/kg", icon="🧬")
+elif page == "Concentración de P en suelo":
+    plot_metric(df_soil, "field6", "Concentración de P en suelo", "mg/kg", unit="mg/kg", icon="🧬")
+elif page == "Concentración de K en suelo":
+    plot_metric(df_soil, "field7", "Concentración de K en suelo", "mg/kg", unit="mg/kg", icon="🧬")
+elif page == "Temperatura del aire":
+    plot_air_temp_with_trend(df_env, "Temperatura del aire", "°C", unit="°C", icon="🌡️")
+elif page == "Humedad del aire":
+    plot_metric(df_env, "field2", "Humedad del aire", "%", unit="%", icon="💦")
+elif page == "Luminosidad":
+    plot_metric(df_env, "field3", "Luminosidad", "lux", unit="lux", icon="💡")
+elif page == "Concentración de CO₂":
+    plot_metric(df_env, "field4", "Concentración de CO₂", "ppm", unit="ppm", icon="🟢")
 elif page == "Resumen":
     col1, col2, col3, col4 = st.columns(4)
     # Últimos valores
-    val_sm, _ = latest_value(df_soil, "field2")   # Soil Moisture
-    val_ta, _ = latest_value(df_env,  "field1")   # Air Temp
-    val_rh, _ = latest_value(df_env,  "field2")   # Air Humidity
-    val_ph, _ = latest_value(df_soil, "field4")   # Soil pH
+    val_sm, _ = latest_value(df_soil, "field2")   # Humedad del suelo
+    val_ta, _ = latest_value(df_env,  "field1")   # Temperatura del aire
+    val_rh, _ = latest_value(df_env,  "field2")   # Humedad del aire
+    val_ph, _ = latest_value(df_soil, "field4")   # pH del suelo
 
     # Fondos dinámicos (rojo si fuera de rango)
     bg_sm = _bg_for_main("soil_moist", val_sm)
@@ -352,15 +360,15 @@ elif page == "Resumen":
     bg_rh = _bg_for_main("air_hum",    val_rh)
     bg_ph = _bg_for_main("soil_ph",    val_ph)
 
-    kpi_card(col1, "Soil Moisture", val_sm, unit="%", icon="💧", bg_color=bg_sm)
-    kpi_card(col2, "Air Temp",      val_ta, unit="°C", icon="🌡️", bg_color=bg_ta)
-    kpi_card(col3, "Air Humidity",  val_rh, unit="%", icon="💦", bg_color=bg_rh)
-    kpi_card(col4, "Soil pH",       val_ph, unit="pH", icon="🧪", bg_color=bg_ph)
+    kpi_card(col1, "Humedad del suelo", val_sm, unit="%", icon="💧", bg_color=bg_sm)
+    kpi_card(col2, "Temp. del aire",    val_ta, unit="°C", icon="🌡️", bg_color=bg_ta)
+    kpi_card(col3, "Humedad del aire",  val_rh, unit="%", icon="💦", bg_color=bg_rh)
+    kpi_card(col4, "pH del suelo",      val_ph, unit="pH", icon="🧪", bg_color=bg_ph)
 
-     # --- Imagen de diagrama, ancho completo ---
+    # --- Imagen de diagrama, ancho completo ---
     st.markdown("### Sistema general")
-    # Opción A: imagen local en tu repo (p.ej. assets/diagrama_sgc.jpg)
-    img_path = "assets/diagrama_sgc.jpg"   # pon el archivo ahí en tu proyecto
+    img_path = "assets/diagrama_sgc.jpg"
     st.image(img_path, use_container_width=True)
 else:
     st.write("Selecciona una métrica del menú lateral.")
+
